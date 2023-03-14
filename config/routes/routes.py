@@ -73,13 +73,13 @@ def add_employee():
 
     if role != 'gm':
         return jsonify({
-            'message': 'Access forbidden!'
+            'message': 'Not authorized!'
         }), 401
     
     emp_data = request.json
     if not emp_data:
         return jsonify({
-            'message' : 'Bad request'
+            'message' : 'Bad request.'
         }), 400
     
     emp_name = emp_data['name']
@@ -94,7 +94,7 @@ def add_employee():
 
     if emp_role not in ['doc', 'assist']:
         return jsonify({
-            'message': 'Invalid role'
+            'message': 'Invalid role.'
         }), 
 
     new_emp = Staff(name=emp_name, email=emp_email, password=emp_password, role=emp_role)
@@ -103,11 +103,24 @@ def add_employee():
     
     return jsonify(emp_data), 201
 
-@routes_bp.route('/manage/remove', methods=['POST'])
+@routes_bp.route('/manage/<int:empId>/remove', methods=['DELETE'])
 @jwt_required()
-def removeEmployee():
-    #TODO Complete function
-    pass
+def removeEmployee(empId):
+    id = get_jwt_identity()
+    staff = Staff.query.filter_by(staff_id=id).first()
+    role = staff.role
+    if role != 'gm':
+        return jsonify({
+            'message': 'Not authorized!'
+        }), 401
+    else:
+        employee = Staff.query.get(empId)
+        db.session.delete(employee)
+        db.session.commit()
+        return jsonify({
+            'message': 'Employee removed!'
+        })
+    
 
 @routes_bp.route('/patient/add', methods=['POST'])
 @jwt_required()
@@ -117,13 +130,13 @@ def add_patient():
     role = staff.role
     if role not in ['gm', 'doc']:
         return jsonify({
-            'message': 'Access forbidden!'
+            'message': 'Not authorized!'
         }), 401
 
     patient_data = request.json
     if not patient_data:
         return jsonify({
-            'message' : 'Bad request'
+            'message' : 'Bad request.'
         }), 400
 
     patient_name = patient_data['name']
@@ -138,12 +151,12 @@ def add_patient():
     appointed_doc = Staff.query.filter_by(staff_id=doc_id).first()
     if not appointed_doc:
         return jsonify({
-            'message': 'Provided ID does not belong to any employee'
+            'message': 'Provided ID does not belong to any employee.'
         }), 401
 
     if appointed_doc.role != 'doc':
         return jsonify({
-            'message': 'Provided ID does not belong to a doctor'
+            'message': 'Provided ID does not belong to a doctor.'
         }), 401
 
     new_patient = Patient(doctor_id=doc_id, name=patient_name, age=patient_age)
@@ -160,7 +173,7 @@ def remove_patient(patientId):
     role = staff.role
     if role not in ['gm', 'doc']:
         return jsonify({
-            'message': 'Access forbidden!'
+            'message': 'Not authorized!'
         }), 401
     else:
         patient = Patient.query.get(patientId)
@@ -168,5 +181,5 @@ def remove_patient(patientId):
         db.session.commit()
         return jsonify({
             'message': 'Patient removed!'
-        }), 204
+        })
 
