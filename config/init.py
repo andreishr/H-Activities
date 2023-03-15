@@ -1,7 +1,7 @@
-from flask import Flask, jsonify, session
+from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 import os
-from datetime import datetime, timedelta
+from datetime import timedelta
 from dotenv import load_dotenv
 from flask_jwt_extended import JWTManager
 
