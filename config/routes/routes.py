@@ -3,7 +3,8 @@ from ..models import Staff, Patient
 from flask_jwt_extended import (create_access_token, set_access_cookies, jwt_required, 
     get_jwt_identity, unset_jwt_cookies, create_refresh_token, set_refresh_cookies)
 from werkzeug.security import check_password_hash, generate_password_hash
-from ..init import db
+from ..init import db, datetime
+
 
 #Create routes blueprint
 routes_bp = Blueprint('routes_bp', __name__)
@@ -81,7 +82,7 @@ def add_employee():
         return jsonify({
             'message' : 'Bad request.'
         }), 400
-    
+
     emp_name = emp_data['name']
     emp_email = emp_data['email']
     emp_password = generate_password_hash(emp_data['password'])
@@ -95,13 +96,55 @@ def add_employee():
     if emp_role not in ['doc', 'assist']:
         return jsonify({
             'message': 'Invalid role.'
-        }), 
+        }), 400
 
     new_emp = Staff(name=emp_name, email=emp_email, password=emp_password, role=emp_role)
     db.session.add(new_emp)
     db.session.commit()
     
     return jsonify(emp_data), 201
+
+@routes_bp.route('/manage/<int:empId>', methods=['PUT'])
+@jwt_required()
+def update_employee(empId):
+    id = get_jwt_identity()
+    staff = Staff.query.filter_by(staff_id=id).first()
+    role = staff.role
+
+    if role != 'gm':
+        return jsonify({
+            'message': 'Not authorized!'
+        }), 401
+
+    data = request.json
+    if not data:
+        return jsonify({
+            'message': 'Bad request.'
+        }), 400
+
+    employee = Staff.query.get(empId)
+    if data['name'] != "":
+        employee.name = data['name']
+
+    if data['email'] != "":
+        employee.email = data['email'] 
+
+    if data['password'] != "":
+        employee.password = generate_password_hash(data['password'])
+        
+    if data['role'] != "":
+        if data['role'] not in ['gm', 'doc', 'assist']:
+            return jsonify({
+                'message': 'Invalid role.'
+            }), 400
+        else:
+            employee.role = data['role']
+
+    db.session.commit()
+
+    return jsonify({
+        'message': 'Credentials modified!'
+    }), 200
 
 @routes_bp.route('/manage/<int:empId>/remove', methods=['DELETE'])
 @jwt_required()
@@ -164,6 +207,48 @@ def add_patient():
     db.session.commit()
 
     return jsonify(patient_data), 201
+
+@routes_bp.route('/patient/<int:patientId>/edit', methods = ['PUT'])
+@jwt_required()
+def edit_patient(patientId):
+    id = get_jwt_identity()
+    staff = Staff.query.filter_by(staff_id=id).first()
+    role = staff.role
+    if role not in ['gm', 'doc']:
+        return jsonify({
+            'message': 'Not authorized!'
+        }), 401
+    data = request.json
+    if not data:
+        return jsonify({
+            'message': 'Bad Request.'
+        }), 401
+    patient = Patient.query.get(patientId)
+    if data['doc_id'] != "":
+        appointed_doc = Staff.query.get(data['doc_id'])
+        if not appointed_doc:
+            return jsonify({
+                'message': 'Provided ID does not belong to any employee.'
+            }), 401
+        if appointed_doc.role != 'doc':
+            return jsonify({
+                'message': 'Provided ID does not belong to a doctor.'
+            }), 401
+        else:
+            patient.doctor_id = data['doc_id']
+    
+    if data['name'] != "":
+        patient.name = data['name']
+
+    if data['age'] != "":
+        patient.age = data['age']
+
+    patient.created_at = datetime.now()
+    db.session.commit()
+
+    return jsonify({
+        'message': 'Credentials modified!'
+    }), 200
 
 @routes_bp.route('/patient/<int:patientId>/delete', methods=['DELETE'])
 @jwt_required()
