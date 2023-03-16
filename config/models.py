@@ -1,7 +1,6 @@
-from config.init import create_app, db
+from config.init import db
 from datetime import datetime
 from sqlalchemy.orm import relationship
-app = create_app()
 
 class Staff(db.Model):
     staff_id = db.Column(db.Integer, primary_key = True)
@@ -53,6 +52,4 @@ class Assistant_treatment(db.Model):
     treatment_id = db.Column(db.Integer, db.ForeignKey('treatment.treatment_id', ondelete='CASCADE'), nullable=False)
 
 
-with app.app_context():
-    db.create_all()
 
