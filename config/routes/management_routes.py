@@ -1,73 +1,14 @@
 from flask import Blueprint, request, jsonify, make_response
-from ..models import Staff, Patient, Treatment, Treatment_patient
-from flask_jwt_extended import (create_access_token, set_access_cookies, jwt_required, 
-    get_jwt_identity, unset_jwt_cookies, create_refresh_token, set_refresh_cookies)
-from werkzeug.security import check_password_hash, generate_password_hash
+from ..models import Staff, Patient, Treatment
+from flask_jwt_extended import jwt_required, get_jwt_identity
+from werkzeug.security import generate_password_hash
 from datetime import datetime
 from ..init import db
 
-#Create routes blueprint
-routes_bp = Blueprint('routes_bp', __name__)
-#TODO Create more blueprints and separate routes
-'''
-Auth routes -----------------------------------------
-'''
-
-@routes_bp.route('/login', methods = ['POST'])
-def login():
-    data = request.json
-    email = data['email']
-    password = data['password']
-    staff = Staff.query.filter_by(email=email).first()
-
-    if not staff:
-        return jsonify({
-            'message' : 'Wrong email or password'
-        }), 400
-    if not check_password_hash(staff.password, password):
-        return jsonify({
-            'message' : 'Wrong email or password'
-        }), 400
-
-    access_token = create_access_token(identity=staff.staff_id)
-    refresh_token = create_refresh_token(identity=staff.staff_id)
-    response = jsonify({
-        'message': 'Login successful'
-    })
-    set_access_cookies(response, access_token)
-    set_refresh_cookies(response, refresh_token)
-    
-    return response, 200
-
-@routes_bp.route('/refresh')
-@jwt_required(refresh=True)
-def refresh():
-    id = get_jwt_identity()
-    access_token = create_access_token(identity=id)
-    response = jsonify({
-        'token': access_token
-    })
-    set_access_cookies(response, access_token, )
-    return response
+manage_routes_bp = Blueprint('manage_routes_bp', __name__)
 
 
-@routes_bp.route('/logout', methods=['DELETE'])
-def logout():
-    response = jsonify({
-        'message': 'Logout successful'
-    })
-    unset_jwt_cookies(response)
-    return response, 200
-
-
-
-'''
-Management routes -----------------------------------------
-'''
-'''
-Employee management routes
-'''
-@routes_bp.route('/manage/add', methods=['POST'])
+@manage_routes_bp.route('/manage/add', methods=['POST'])
 @jwt_required()
 def add_employee():
     id = get_jwt_identity()
@@ -106,7 +47,7 @@ def add_employee():
     
     return jsonify(emp_data), 201
 
-@routes_bp.route('/manage/<int:empId>', methods=['PUT'])
+@manage_routes_bp.route('/manage/<int:empId>', methods=['PUT'])
 @jwt_required()
 def update_employee(empId):
     id = get_jwt_identity()
@@ -152,7 +93,7 @@ def update_employee(empId):
         'message': 'Credentials modified!'
     }), 200
 
-@routes_bp.route('/manage/<int:empId>/remove', methods=['DELETE'])
+@manage_routes_bp.route('/manage/<int:empId>/remove', methods=['DELETE'])
 @jwt_required()
 def removeEmployee(empId):
     id = get_jwt_identity()
@@ -172,10 +113,11 @@ def removeEmployee(empId):
     
 
 
+
 '''
 Patient management routes:
 '''
-@routes_bp.route('/patient/add', methods=['POST'])
+@manage_routes_bp.route('/patient/add', methods=['POST'])
 @jwt_required()
 def add_patient():
     id = get_jwt_identity()
@@ -218,7 +160,8 @@ def add_patient():
 
     return jsonify(patient_data), 201
 
-@routes_bp.route('/patient/<int:patientId>/edit', methods = ['PUT'])
+
+@manage_routes_bp.route('/patient/<int:patientId>/edit', methods = ['PUT'])
 @jwt_required()
 def edit_patient(patientId):
     id = get_jwt_identity()
@@ -264,7 +207,8 @@ def edit_patient(patientId):
         'message': 'Credentials modified!'
     }), 200
 
-@routes_bp.route('/patient/<int:patientId>/delete', methods=['DELETE'])
+
+@manage_routes_bp.route('/patient/<int:patientId>/delete', methods=['DELETE'])
 @jwt_required()
 def remove_patient(patientId):
     id = get_jwt_identity()
@@ -282,10 +226,13 @@ def remove_patient(patientId):
             'message': 'Patient removed!'
         })
 
+
+
+
 '''
 Treatment management routes:
 '''
-@routes_bp.route('/treatment/add', methods=['POST'])
+@manage_routes_bp.route('/treatment/add', methods=['POST'])
 @jwt_required()
 def add_treatment():
     id = get_jwt_identity()
@@ -325,7 +272,8 @@ def add_treatment():
     db.session.commit()
     return jsonify(treatment_data), 201  
 
-@routes_bp.route('/treatment/<int:treatId>/edit', methods=['PUT'])
+
+@manage_routes_bp.route('/treatment/<int:treatId>/edit', methods=['PUT'])
 @jwt_required()
 def edit_treatment(treatId):
     id = get_jwt_identity()
@@ -372,7 +320,8 @@ def edit_treatment(treatId):
         'message': 'Treatment modified!'
     }), 200
 
-@routes_bp.route('/treatment/<int:treatId>/remove', methods=['DELETE'])
+
+@manage_routes_bp.route('/treatment/<int:treatId>/remove', methods=['DELETE'])
 @jwt_required()
 def remove_treatment(treatId):
     id = get_jwt_identity()
@@ -389,46 +338,3 @@ def remove_treatment(treatId):
     return jsonify({
         'message': 'Treatment removed!'
     })
-
-
-'''
-Utility routes -----------------------------------------
-'''
-@routes_bp.route('/give/treatment/<int:patientId>/<int:treatId>', methods=['POST'])
-@jwt_required()
-def give_treatment(patientId, treatId):
-    id = get_jwt_identity()
-    staff = Staff.query.filter_by(staff_id=id).first()
-    role = staff.role
-    if role not in ['gm', 'doc']:
-        return jsonify({
-            'message': 'A treatment should be recommended by a doctor.'
-        })
-    
-    data = request.json
-    if not data:
-        return jsonify({
-            'missing': 'Bad Request!'
-        }), 400
-
-    employee = Staff.query.get(data['doc_id'])
-    if not employee:
-        return jsonify({
-            'missing': 'Invalid employee ID' 
-        }), 400
-    if employee.role != 'doc':
-        return jsonify({
-            'missing': 'Invalid doctor ID' 
-        }), 400
-
-    existing_treat = Treatment_patient.query.filter_by(treatment_id=treatId, patient_id=patientId).first()
-    if existing_treat is not None:
-        return jsonify({
-            'message': 'This treatment has been given to this patient.'
-        })
-    treat_to_patient = Treatment_patient(treatment_id=treatId, patient_id=patientId, assigned_by=employee.staff_id)
-    db.session.add(treat_to_patient)
-    db.session.commit()
-    return jsonify({
-        'message': 'Treatment applied!'
-    }), 200
