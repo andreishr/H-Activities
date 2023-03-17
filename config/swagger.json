@@ -1,0 +1,82 @@
+{
+    "paths": {
+        "/login": {
+            "post": {
+                "tags": ["Authentication"],
+                "parameters": [
+                    {
+                        "name": "email",
+                        "type": "string",
+                        "required": true,
+                        "description": "User email"
+                    },
+                    {
+                        "name": "password",
+                        "type": "string",
+                        "required": true,
+                        "description": "User password"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User created successfully",
+                            "examples": {
+                                "application/json": {"msg": "User created successfully"}
+                            }
+                    },
+                    "401": {
+                        "description": "Bad request",
+                            "examples": {
+                                "application/json": {"msg": "Bad username or password"}
+                            }
+                    }
+                }
+            }
+        },
+        "/manage/add": {
+            "post": {
+                "tags": ["Management"],
+                "parameters": [
+                    {
+                        "name": "name",
+                        "type": "string",
+                        "required": true,
+                        "description": "User name"
+                    },
+                    {
+                        "name": "email",
+                        "type": "string",
+                        "required": true,
+                        "description": "User email"
+                    },
+                    {
+                        "name": "role",
+                        "type": "string",
+                        "required": true,
+                        "description": "User role"
+                    }
+                ],
+                "responses":{
+                    "201": {
+                        "description": "Employee added",
+                            "examples": {
+                                "application/json": {"msg": "Employee credentials returned"}
+                            }
+                    },
+                    "401": {
+                        "description": "Invalid role",
+                            "examples": {
+                                "application/json": {"msg": "Not Authorized"}
+                            }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                            "examples": {
+                                "application/json": {"msg": "Missing information"}
+                            }
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,4 +1,4 @@
-from config.init import db
+from config.configapp import db
 from datetime import datetime
 from sqlalchemy.orm import relationship
 
@@ -19,6 +19,8 @@ class Patient(db.Model):
     doctor_id = db.Column(db.Integer, db.ForeignKey('staff.staff_id', ondelete='CASCADE'))
     name = db.Column(db.String(40), nullable=False)
     age = db.Column(db.Integer, nullable = False)
+    disease = db.Column(db.String(50))
+    details = db.Column(db.Text())
     created_at = db.Column(db.DateTime, default=datetime.now())
     treat_patient = relationship("Treatment_patient", cascade="all, delete")
     assistant_assign = relationship("Assistant_assignment", cascade="all,delete")

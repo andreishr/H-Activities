@@ -1,4 +1,4 @@
-from config.init import create_app, db
+from config.configapp import create_app, db
 from config.routes.auth_routes import auth_routes_bp
 from config.routes.management_routes import manage_routes_bp
 from config.routes.utility_routes import utility_routes_bp

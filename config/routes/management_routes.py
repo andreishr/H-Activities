@@ -3,7 +3,7 @@ from ..models import Staff, Patient, Treatment
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from werkzeug.security import generate_password_hash
 from datetime import datetime
-from ..init import db
+from ..configapp import db
 
 manage_routes_bp = Blueprint('manage_routes_bp', __name__)
 
@@ -200,6 +200,12 @@ def edit_patient(patientId):
     if data['age'] != "":
         patient.age = data['age']
 
+    if data['disease'] != "":
+        patient.disease = data['disease']
+
+    if data['details'] != "":
+        patient.details = data['details']
+    
     patient.created_at = datetime.now()
     db.session.commit()
 
@@ -224,8 +230,7 @@ def remove_patient(patientId):
         db.session.commit()
         return jsonify({
             'message': 'Patient removed!'
-        })
-
+        }), 204
 
 
 

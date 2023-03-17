@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 from ..models import Staff, Patient, Treatment_patient, Assistant_assignment, Assistant_treatment
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from ..init import db
+from ..configapp import db
 
 utility_routes_bp = Blueprint('utility_routes_bp', __name__)
 

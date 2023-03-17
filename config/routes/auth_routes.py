@@ -17,16 +17,17 @@ def login():
     if not staff:
         return jsonify({
             'message' : 'Wrong email or password'
-        }), 400
+        }), 401
     if not check_password_hash(staff.password, password):
         return jsonify({
             'message' : 'Wrong email or password'
-        }), 400
+        }), 401
 
     access_token = create_access_token(identity=staff.staff_id)
     refresh_token = create_refresh_token(identity=staff.staff_id)
     response = jsonify({
-        'message': 'Login successful'
+        'message': 'Login successful',
+        'access_token': access_token
     })
     set_access_cookies(response, access_token)
     set_refresh_cookies(response, refresh_token)
