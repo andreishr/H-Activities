@@ -1,9 +1,6 @@
-from flask import Blueprint, request, jsonify, make_response
-from ..models import Staff, Patient, Treatment, Treatment_patient, Assistant_assignment, Assistant_treatment
-from flask_jwt_extended import (create_access_token, set_access_cookies, jwt_required, 
-    get_jwt_identity, unset_jwt_cookies, create_refresh_token, set_refresh_cookies)
-from werkzeug.security import check_password_hash, generate_password_hash
-from datetime import datetime
+from flask import Blueprint, request, jsonify
+from ..models import Staff, Patient, Treatment_patient, Assistant_assignment, Assistant_treatment
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from ..init import db
 
 utility_routes_bp = Blueprint('utility_routes_bp', __name__)

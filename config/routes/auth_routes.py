@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, make_response
+from flask import Blueprint, request, jsonify
 from ..models import Staff
 from flask_jwt_extended import (create_access_token, set_access_cookies, jwt_required, 
     get_jwt_identity, unset_jwt_cookies, create_refresh_token, set_refresh_cookies)
