@@ -31,7 +31,7 @@ class Test(unittest.TestCase):
         
     def test_delete_patient(self):
         headers = self.get_cookie_headers()
-        response = requests.delete(self.BASE + "/patient/19/delete", headers=headers)
+        response = requests.delete(self.BASE + "/patient/32/delete", headers=headers)
         self.assertEqual(response.status_code, 204)
         print('\nTEST 3 COMPLETED:')
 
@@ -69,6 +69,14 @@ class Test(unittest.TestCase):
                 },headers=headers)
         self.assertEqual(response.status_code, 400)
         print('\nTEST 7 COMPLETED:')
+
+    def test_apply_treat(self):
+        headers = self.get_cookie_headers()
+        response = requests.post(self.BASE + '/tr/applied', json={
+                "treat_id": 1
+                },headers=headers)
+        self.assertEqual(response.status_code, 401)
+        print('\nTEST 8 COMPLETED:')
 
 if __name__=='__main__':
     unittest.main()
