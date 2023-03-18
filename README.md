@@ -2,7 +2,7 @@
 ## Install process:       
 ### ∙ Creating environment:  
 python -m venv .<env_name> (ex: .apienv)  
-
+Activate the environment: .api_env\Scripts\activate
 ### ∙ Installing dependencies:
 pip install -r requirements.txt
     
