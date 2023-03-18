@@ -30,9 +30,10 @@ def doc_patient():
             patient_dict['patient_name'] = patient.name
             patients_list.append(patient_dict)
         report_dict['doc_patients'] = patients_list
+        report_dict['Statistics'] = ""
         report_result.append(report_dict)
 
-    return jsonify(report_result)
+    return jsonify(report_result), 200
    
 
 @report_routes_bp.route('/treat/report', methods=['GET'])
@@ -56,7 +57,7 @@ def treats_applied():
     if not patient:
         return jsonify({
             'message': 'Invalid patient ID'
-        })
+        }), 400
 
     treatments = db.session.query(Treatment).join(Treatment_patient, Treatment_patient.treatment_id==Treatment.treatment_id)\
         .filter(Treatment_patient.patient_id==patient_id).all()

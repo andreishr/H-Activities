@@ -1,22 +1,31 @@
 {
+    "info": {
+	    "title": "Hospital Activities API",
+	    "version": "0.0.1",
+        "description": "API for hospital activities. It provides management for treatments, patients and employees."
+	},
     "paths": {
         "/login": {
             "post": {
                 "tags": ["Authentication"],
-                "parameters": [
-                    {
-                        "name": "email",
-                        "type": "string",
-                        "required": true,
-                        "description": "User email"
-                    },
-                    {
-                        "name": "password",
-                        "type": "string",
-                        "required": true,
-                        "description": "User password"
+                "parameters": [{
+                    "in": "body",
+                    "name": "body",
+                    "required": true,
+                    "schema": {
+                        "properties": {
+                            "email": {
+                                "example": "michaelgm@hospital-api.com",
+                                "type": "string"
+                            },
+                            "password": {
+                                "example": "gmMichael",
+                                "type": "string"
+                            }
+                        },
+                        "required": ["email", "password"]
                     }
-                ],
+                }],
                 "responses": {
                     "200": {
                         "description": "User created successfully",
@@ -36,31 +45,49 @@
         "/manage/add": {
             "post": {
                 "tags": ["Management"],
-                "parameters": [
-                    {
-                        "name": "name",
-                        "type": "string",
+                "parameters": [{
+                        "in": "header",
+                        "name": "Authorization",
                         "required": true,
-                        "description": "User name"
+                        "type": "string",
+                        "description": "Bearer token"
                     },
                     {
-                        "name": "email",
-                        "type": "string",
-                        "required": true,
-                        "description": "User email"
-                    },
-                    {
-                        "name": "role",
-                        "type": "string",
-                        "required": true,
-                        "description": "User role"
+                    "in": "body",
+                    "name": "body",
+                    "required": true,
+                    "schema": {
+                        "properties": {
+                            "name": {
+                                "example": "Maya",
+                                "type": "string"
+                            },
+                            "email": {
+                                "example": "mayassist@hospital-api.com",
+                                "type": "string"
+                            },
+                            "password": {
+                                "example": "assistMaya",
+                                "type": "string"
+                            },
+                            "role": {
+                                "example": "assist",
+                                "type": "string"
+                            }
+                        },
+                        "required": ["name","email", "password","role"]
                     }
-                ],
+                }],
                 "responses":{
                     "201": {
                         "description": "Employee added",
                             "examples": {
-                                "application/json": {"msg": "Employee credentials returned"}
+                                "application/json": {
+                                    "email": "mayassist@hospital-api.com",
+                                    "name": "Maya",
+                                    "password": "assistMaya",
+                                    "role": "assist"
+                                }
                             }
                     },
                     "401": {
@@ -73,6 +100,898 @@
                         "description": "Bad request",
                             "examples": {
                                 "application/json": {"msg": "Missing information"}
+                            }
+                    }
+                }
+            }
+        },
+        "/manage/{id}":{
+            "put": {
+                "tags": ["Management"],
+                "parameters": [{
+                    "in": "header",
+                    "name": "Authorization",
+                    "required": true,
+                    "type": "string",
+                    "description": "Bearer token"
+                },
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "schema": {
+                        "type": "integer"
+                    }
+                },
+                {
+                    "in": "body",
+                    "name": "body",
+                    "required": true,
+                    "schema": {
+                        "properties": {
+                            "name": {
+                                "example": "John",
+                                "type": "string"
+                            },
+                            "email": {
+                                "example": "johngm@hospital-api.com",
+                                "type": "string"
+                            },
+                            "password": {
+                                "example": "gmJohn",
+                                "type": "string"
+                            },
+                            "role": {
+                                "example": "gm",
+                                "type": "string"
+                            }
+                        },
+                        "required": ["name","email", "password","role"]
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "Employee changed",
+                            "examples": {
+                                "application/json": {
+                                    "message": "Credentials modified!"
+                                }
+                            }
+                    },
+                    "401": {
+                        "description": "Invalid role",
+                            "examples": {
+                                "application/json": {"msg": "Not Authorized"}
+                            }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                            "examples": {
+                                "application/json": {
+                                    "wrong_role_selected": {
+                                        "message": "Invalid role."     
+                                    },
+                                    "missing_data_information":{
+                                        "message": "Bad Request."
+                                    }
+                                }  
+                            }
+                    }
+                }
+            }
+        },
+        "/manage/{id}/remove": {
+            "delete":{
+                "tags": ["Management"],
+                "parameters": [{
+                    "in": "header",
+                    "name": "Authorization",
+                    "required": true,
+                    "type": "string",
+                    "description": "Bearer token"
+                },
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "schema": {
+                        "type": "integer"
+                    }
+                }
+                ],
+                "responses":{
+                    "401": {
+                        "description": "Invalid role",
+                            "examples": {
+                                "application/json": {"msg": "Not Authorized"}
+                            }
+                    }
+                }
+            }
+        },
+        "/patient/add": {
+            "post":{
+                "tags": ["Management"],
+                "parameters":[{
+                    "in": "header",
+                    "name": "Authorization",
+                    "required": true,
+                    "type": "string",
+                    "description": "Bearer token"
+                },
+                {
+                    "in": "body",
+                    "name": "body",
+                    "required": true,
+                    "schema": {
+                        "properties": {
+                            "name": {
+                                "example": "Mark",
+                                "type": "string"
+                            },
+                            "age": {
+                                "example": "24",
+                                "type": "integer"
+                            },
+                            "doc_id": {
+                                "example": "2",
+                                "type": "integer"
+                            }
+                        },
+                        "required": ["name","age", "doc_id"]
+                    }
+                }],
+                "responses":{
+                    "201": {
+                        "description": "Patient added",
+                            "examples": {
+                                "application/json": {
+                                    "name" : "Mark",
+                                    "age" : "24",
+                                    "doc_id" : "6"
+                                }
+                            }
+                    },
+                    "401": {
+                        "description": "Invalid role",
+                            "examples": {
+                                "application/json": {"msg": "Not Authorized"}
+                            }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                            "examples": {
+                                "application/json": {
+                                    "wrong_information_provided": {
+                                        "message": "Invalid provided ID"     
+                                    },
+                                    "missing_data_information":{
+                                        "message": "Missing Information"
+                                    }
+                                }  
+                            }
+                    }
+                }
+            }
+        },
+        "/patient/{id}/edit": {
+            "put": {
+                "tags": ["Management"],
+                "parameters": [{
+                    "in": "header",
+                    "name": "Authorization",
+                    "required": true,
+                    "type": "string",
+                    "description": "Bearer token"
+                },
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "schema": {
+                        "type": "integer"
+                    }
+                },
+                {
+                    "in": "body",
+                    "name": "body",
+                    "required": true,
+                    "schema": {
+                        "properties": {
+                            "doc_id": {
+                                "example": "2",
+                                "type": "integer"
+                            },
+                            "name": {
+                                "example": "Matt",
+                                "type": "string"
+                            },
+                            "age": {
+                                "example": "23",
+                                "type": "integer"
+                            },
+                            "disease": {
+                                "example": "Diabetis",
+                                "type": "string"
+                            },
+                            "details": {
+                                "example": "",
+                                "type": "string"
+                            }
+                        },
+                        "required": ["name","email", "password","role"]
+                    }
+                }],
+                "responses":{
+                    "200": {
+                        "description": "Patient edit successfully",
+                            "examples": {
+                                "application/json": {
+                                    "message": "Credentials modified!"
+                                }
+                            }
+                    },
+                    "401": {
+                        "description": "Invalid role",
+                            "examples": {
+                                "application/json": {"msg": "Not Authorized"}
+                            }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                            "examples": {
+                                "application/json": {
+                                    "wrong_information_provided": {
+                                        "message": "Invalid provided ID."     
+                                    },
+                                    "missing_data_information":{
+                                        "message": "Bad Request."
+                                    }
+                                }  
+                            }
+                    }
+                }
+            }
+        },
+        "/patient/{id}/delete":{
+            "delete":{
+                "tags": ["Management"],
+                "parameters": [{
+                    "in": "header",
+                    "name": "Authorization",
+                    "required": true,
+                    "type": "string",
+                    "description": "Bearer token"
+                },
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "schema": {
+                        "type": "integer"
+                    }
+                }
+                ],
+                "responses":{
+                    "401": {
+                        "description": "Invalid role",
+                            "examples": {
+                                "application/json": {"msg": "Not Authorized"}
+                            }
+                    },
+                    "204": {
+                        "description": "Patient removed succesfully",
+                        "examples": {
+                            "application/json": {"msg": "Patient removed"}
+                        }
+                    }
+                }
+            }
+        },
+        "/treatment/add":{
+            "post":{
+                "tags": ["Management"],
+                "parameters":[{
+                    "in": "header",
+                    "name": "Authorization",
+                    "required": true,
+                    "type": "string",
+                    "description": "Bearer token"
+                },
+                {
+                    "in": "body",
+                    "name": "body",
+                    "required": true,
+                    "schema": {
+                        "properties": {
+                            "name": {
+                                "example": "Bronchitis Treatment",
+                                "type": "string"
+                            },
+                            "description": {
+                                "example": "Ventolin, Mucinex",
+                                "type": "string"
+                            },
+                            "doc_id": {
+                                "example": "2",
+                                "type": "integer"
+                            }
+                        },
+                        "required": ["name","description", "doc_id"]
+                    }
+                }],
+                "responses":{
+                    "201": {
+                        "description": "Treatment added",
+                            "examples": {
+                                "application/json": {
+                                    "name": "Bronchitis Treatment",
+                                    "description": "Ventolin, Mucinex",
+                                    "doc_id": "2"
+                                }
+                            }
+                    },
+                    "401": {
+                        "description": "Invalid role",
+                            "examples": {
+                                "application/json": {
+                                    "invalid_role_responses": {
+                                        "msg_wrong_staff_role": "Not Authorized",
+                                        "msg_invelid_doc_role": "Cannot add a treatment that is not issued by a doctor"
+                                    }
+                                }
+                            }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                            "examples": {
+                                "application/json": {
+                                    "wrong_information_provided": {
+                                        "message": "Invalid provided ID"     
+                                    },
+                                    "missing_data_information":{
+                                        "message": "Missing Information"
+                                    }
+                                }  
+                            }
+                    }
+                }
+            }
+        },
+        "/treatment/{id}/edit": {
+            "put":{
+                "tags": ["Management"],
+                "parameters":[{
+                    "in": "header",
+                    "name": "Authorization",
+                    "required": true,
+                    "type": "string",
+                    "description": "Bearer token"
+                },
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "schema": {
+                        "type": "integer"
+                    }
+                },
+                {
+                    "in": "body",
+                    "name": "body",
+                    "required": true,
+                    "schema": {
+                        "properties": {
+                            "name": {
+                                "example": "Bronchitis Treatment",
+                                "type": "string"
+                            },
+                            "description": {
+                                "example": "Tylenol, Xopenex, Mucinex, amoxicillin",
+                                "type": "string"
+                            },
+                            "doc_id": {
+                                "example": "2",
+                                "type": "integer"
+                            }
+                        },
+                        "required": ["name","description", "doc_id"]
+                    }
+                }],
+                "responses":{
+                    "200": {
+                        "description": "Treatment modified succesfully",
+                            "examples": {
+                                "application/json": {
+                                    "message": "Treatment modified"
+                                }
+                            }
+                    },
+                    "401": {
+                        "description": "Invalid role",
+                            "examples": {
+                                "application/json": {
+                                    "invalid_role_responses": {
+                                        "msg_wrong_staff_role": "Not Authorized",
+                                        "msg_invalid_doc_role": "Cannot add a treatment that is not issued by a doctor"
+                                    }
+                                }
+                            }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                            "examples": {
+                                "application/json": {
+                                    "wrong_information_provided": {
+                                        "message": "Invalid provided ID"     
+                                    },
+                                    "missing_data_information":{
+                                        "message": "Missing Information"
+                                    }
+                                }  
+                            }
+                    }
+                }
+            }
+        },
+        "treatment/{id}/remove": {
+            "delete":{
+                "tags": ["Management"],
+                "parameters":[{
+                    "in": "header",
+                    "name": "Authorization",
+                    "required": true,
+                    "type": "string",
+                    "description": "Bearer token"
+                },
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "schema": {
+                        "type": "integer"
+                    }
+                }
+                ],
+                "responses":{
+                    "401": {
+                        "description": "Invalid role",
+                            "examples": {
+                                "application/json": {"msg": "Not Authorized"}
+                            }
+                    },
+                    "204": {
+                        "description": "Treatment removed succesfully",
+                        "examples": {
+                            "application/json": {"msg": "Treatment removed"}
+                        }
+                    }
+                }
+            }
+        },
+        "/give/treatment/{patientId}/{treatId}":{
+            "post": {
+                "tags":["Utility"],
+                "parameters":[{
+                    "in": "header",
+                    "name": "Authorization",
+                    "required": true,
+                    "type": "string",
+                    "description": "Bearer token"
+                },
+                {
+                    "name": "patientId",
+                    "in": "path",
+                    "required": true,
+                    "schema": {
+                        "type": "integer"
+                    }
+                },
+                {
+                    "name": "treatId",
+                    "in": "path",
+                    "required": true,
+                    "schema": {
+                        "type": "integer"
+                    }
+                },
+                {
+                    "in": "body",
+                    "name": "body",
+                    "required": true,
+                    "schema": {
+                        "properties": {
+                            "doc_id": {
+                                "example": "6",
+                                "type": "integer"
+                            }
+                        },
+                        "required": ["doc_id"]
+                    }
+                }
+                ],
+                "responses":{
+                    "200": {
+                        "description": "Treatment applied succesfully",
+                            "examples": {
+                                "application/json": {
+                                    "message": "Treatment applied"
+                                }
+                            }
+                    },
+                    "401": {
+                        "description": "Invalid role",
+                            "examples": {
+                                "application/json": {
+                                    "invalid_role_responses": {
+                                        "msg_wrong_staff_role": "Not Authorized",
+                                        "msg_invalid_doc_role": "Cannot add a treatment that is not issued by a doctor"
+                                    }
+                                }
+                            }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                            "examples": {
+                                "application/json": {
+                                    "wrong_information_provided": {
+                                        "message": "Invalid provided ID"     
+                                    },
+                                    "missing_data_information":{
+                                        "message": "Bad Request"
+                                    }
+                                }  
+                            }
+                    }
+                }
+            }
+        },
+        "/tr/prescribed": {
+            "get":{
+                "tags":["Utility"],
+                "parameters":[{
+                    "in": "header",
+                    "name": "Authorization",
+                    "required": true,
+                    "type": "string",
+                    "description": "Bearer token"
+                },
+                {
+                    "in": "body",
+                    "name": "body",
+                    "required": true,
+                    "schema": {
+                        "properties": {
+                            "treat_id": {
+                                "example": "1",
+                                "type": "integer"
+                            },
+                            "patient_id": {
+                                "example": "4",
+                                "type": "integer"
+                            }
+                        },
+                        "required": ["treat_id", "patient_id"]
+                    }
+                }
+                ],
+                "responses":{
+                    "200": {
+                        "description": "Return treatment applied by doctor",
+                            "examples": {
+                                "application/json": {
+                                    "given_by_doc_id": "6",
+                                    "patient_id": "4",
+                                    "treatment_id": "1"
+                                }
+                            }
+                    },
+                    "401": {
+                        "description": "Invalid role",
+                            "examples": {
+                                "application/json": {
+                                    "invalid_role_responses": {
+                                        "msg_wrong_staff_role": "Not Authorized"
+                                    }
+                                }
+                            }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                            "examples": {
+                                "application/json": {
+                                    "wrong_information_provided": {
+                                        "message": "Invalid provided ID"     
+                                    },
+                                    "missing_data_information":{
+                                        "message": "Missing Information"
+                                    },
+                                    "missing_treat_applied":{
+                                        "message": "This treatment is not applied to any patient"
+                                    }
+                                }  
+                            }
+                    }
+                }
+            }
+        },
+        "/assign": {
+            "post" :{
+                "tags":["Utility"],
+                "parameters":[{
+                    "in": "header",
+                    "name": "Authorization",
+                    "required": true,
+                    "type": "string",
+                    "description": "Bearer token"
+                },
+                {
+                    "in": "body",
+                    "name": "body",
+                    "required": true,
+                    "schema": {
+                        "properties": {
+                            "assistant_id": {
+                                "example": "5",
+                                "type": "integer"
+                            },
+                            "patient_id": {
+                                "example": "4",
+                                "type": "integer"
+                            }
+                        },
+                        "required": ["assistant_id", "patient_id"]
+                    }
+                }
+                ],
+                "responses":{
+                    "200": {
+                        "description": "Patient assigned to assistant",
+                            "examples": {
+                                "application/json": {
+                                    "assistant_id": "5",
+                                    "patient_id": "10"
+                                }
+                            }
+                    },
+                    "401": {
+                        "description": "Invalid role",
+                            "examples": {
+                                "application/json": {
+                                    "invalid_role_responses": {
+                                        "msg_wrong_staff_role": "Not Authorized"
+                                    }
+                                }
+                            }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                            "examples": {
+                                "application/json": {
+                                    "wrong_information_provided": {
+                                        "message": "Invalid provided ID"     
+                                    },
+                                    "missing_data_information":{
+                                        "message": "Missing Information or Bad Request"
+                                    }
+                                }  
+                            }
+                    }
+                }
+            }
+        },
+        "/tr/applied": {
+            "post":{
+                "tags":["Utility"],
+                "parameters":[{
+                    "in": "header",
+                    "name": "Authorization",
+                    "required": true,
+                    "type": "string",
+                    "description": "Bearer token"
+                },
+                {
+                    "in": "body",
+                    "name": "body",
+                    "required": true,
+                    "schema": {
+                        "properties": {
+                            "treat_id": {
+                                "example": "5",
+                                "type": "integer"
+                            }
+                        },
+                        "required": ["treat_id"]
+                    }
+                }
+                ],
+                "responses":{
+                "200": {
+                    "description": "Patient assigned to assistant",
+                        "examples": {
+                            "application/json": {
+                                "treatment_id": "11",
+                                "assistant_id": "5"
+                            }
+                        }
+                },
+                "401": {
+                    "description": "Invalid role",
+                        "examples": {
+                            "application/json": {
+                                "invalid_role_responses": {
+                                    "msg_wrong_staff_role": "Not Authorized"
+                                }
+                            }
+                        }
+                },
+                "400": {
+                    "description": "Bad request",
+                        "examples": {
+                            "application/json": {
+                                "wrong_information_provided": {
+                                    "message": "Invalid provided ID"     
+                                },
+                                "missing_data_information":{
+                                    "message": "Missing Information or Bad Request"
+                                }
+                            }  
+                        }
+                }
+                }
+            },
+            "get":{
+                "tags":["Utility"],
+                "parameters":[{
+                    "in": "header",
+                    "name": "Authorization",
+                    "required": true,
+                    "type": "string",
+                    "description": "Bearer token"
+                }],
+                "responses":{
+                    "200": {
+                        "description": "Treatments applied by assistants",
+                            "examples": {
+                                "application/json": {
+                                    "assistant_id": "5",
+                                    "treatment_id": "1"
+                                }
+                            }
+                    },
+                    "401": {
+                        "description": "Invalid role",
+                            "examples": {
+                                "application/json": {
+                                    "invalid_role_responses": {
+                                        "msg_wrong_staff_role": "Not Authorized"
+                                    }
+                                }
+                            }
+                    }
+                }
+            }
+        },
+        "/docs/report":{
+            "get":{
+                "tags":["Reports"],
+                "parameters":[{
+                    "in": "header",
+                    "name": "Authorization",
+                    "required": true,
+                    "type": "string",
+                    "description": "Bearer token"
+                }],
+                "responses":{
+                    "200": {
+                        "description": "JSON report generated",
+                            "examples": {
+                                "application/json": {
+                                    "Statistics": "",
+                                    "doc_id": 2,
+                                    "doc_name": "Ash",
+                                    "doc_patients": [
+                                        {
+                                            "patient.id": 1,
+                                            "patient_name": "Michael"
+                                        },
+                                        {
+                                            "patient.id": 3,
+                                            "patient_name": "John"
+                                        },
+                                        {
+                                            "patient.id": 11,
+                                            "patient_name": "John"
+                                        },
+                                        {
+                                            "patient.id": 12,
+                                            "patient_name": "Matt"
+                                        }
+                                    ]
+                                }
+                            }
+                    },
+                    "401": {
+                        "description": "Invalid role",
+                            "examples": {
+                                "application/json": {
+                                    "invalid_role_responses": {
+                                        "msg_wrong_staff_role": "Not Authorized"
+                                    }
+                                }
+                            }
+                    }
+                }
+                
+            }
+        },
+        "/treat/report": {
+            "get":{
+                "tags":["Reports"],
+                "parameters":[{
+                    "in": "header",
+                    "name": "Authorization",
+                    "required": true,
+                    "type": "string",
+                    "description": "Bearer token"
+                },
+                {
+                    "in":"body",
+                    "name":"body",
+                    "required":true,
+                    "schema":{
+                        "properties": {
+                            "patient_id": {
+                                "example": "1",
+                                "type": "integer"
+                            }
+                        },
+                        "required": ["patient_id"]
+                    }
+                }],
+                "responses":{
+                    "200": {
+                        "description": "JSON report generated",
+                            "examples": {
+                                "application/json": {
+                                    "patient_id": 1,
+                                    "patient_name": "Michael",
+                                    "treats_applied": [
+                                        {
+                                            "treat_desc": "Tylenol, Xopenex, Mucinex, amoxicillin",
+                                            "treat_id": 1,
+                                            "treat_name": "Bronchitis Treatment"
+                                        },
+                                        {
+                                            "treat_desc": "Ventolin, amoxicillin",
+                                            "treat_id": 3,
+                                            "treat_name": "Bronchitis Treatment"
+                                        }
+                                    ]
+                                }
+                            }
+                    },
+                    "401": {
+                        "description": "Invalid role",
+                            "examples": {
+                                "application/json": {
+                                    "invalid_role_responses": {
+                                        "msg_wrong_staff_role": "Not Authorized"
+                                    }
+                                }
+                            }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                            "examples": {
+                                "application/json": {
+                                    "wrong_information_provided": {
+                                        "message": "Invalid provided ID"     
+                                    },
+                                    "missing_data_information":{
+                                        "message": "Bad Request"
+                                    }
+                                }  
                             }
                     }
                 }

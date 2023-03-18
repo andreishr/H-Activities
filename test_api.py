@@ -18,7 +18,7 @@ class Test(unittest.TestCase):
     def test_login(self):
         response = requests.post(self.BASE + "/login", json = self.data_login_gm)
         self.assertEqual(response.status_code, 200) 
-        print('[=====> TEST 1 COMPLETED:')
+        print('\nTEST 1 COMPLETED:')
 
     def test_add_patient(self):
         headers = self.get_cookie_headers()
@@ -27,13 +27,13 @@ class Test(unittest.TestCase):
                 "doc_id" : "7"
                 }, headers=headers)
         self.assertEqual(response.status_code, 201)
-        print('[=====> TEST 2 COMPLETED:')
+        print('\nTEST 2 COMPLETED:')
         
     def test_delete_patient(self):
         headers = self.get_cookie_headers()
         response = requests.delete(self.BASE + "/patient/19/delete", headers=headers)
         self.assertEqual(response.status_code, 204)
-        print('[=====> TEST 3 COMPLETED:')
+        print('\nTEST 3 COMPLETED:')
 
     def test_edit_patient(self):
         headers = self.get_cookie_headers()
@@ -44,7 +44,7 @@ class Test(unittest.TestCase):
                 "details": ""
                 },headers=headers)
         self.assertEqual(response.status_code, 200)
-        print('[=====> TEST 4 COMPLETED:')
+        print('\nTEST 4 COMPLETED:')
 
     def test_treat_add(self):
         headers = self.get_cookie_headers()
@@ -53,7 +53,22 @@ class Test(unittest.TestCase):
                 "doc_id": "2"
                 },headers=headers)
         self.assertEqual(response.status_code, 201)
-        print('[=====> TEST 5 COMPLETED:')
+        print('\nTEST 5 COMPLETED:')
+
+    def test_report_docs(self):
+        headers = self.get_cookie_headers()
+        response = requests.get(self.BASE + "/docs/report", headers=headers)
+        self.assertEqual(response.status_code, 200)
+        print('\nTEST 6 COMPLETED:')
+
+    def test_assign_patient(self):
+        headers = self.get_cookie_headers()
+        response = requests.post(self.BASE + "/assign", json={
+                "assistant_id": 5,
+                "patient_id": 4
+                },headers=headers)
+        self.assertEqual(response.status_code, 400)
+        print('\nTEST 7 COMPLETED:')
 
 if __name__=='__main__':
     unittest.main()

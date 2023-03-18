@@ -13,8 +13,8 @@ def give_treatment(patientId, treatId):
     role = staff.role
     if role not in ['gm', 'doc']:
         return jsonify({
-            'message': 'A treatment should be recommended by a doctor.'
-        })
+            'message': 'Not Authorized'
+        }), 401
     
     data = request.json
     if not data:
@@ -45,7 +45,7 @@ def give_treatment(patientId, treatId):
     }), 200
 
 
-@utility_routes_bp.route('/t/applied', methods=['GET'])
+@utility_routes_bp.route('/tr/prescribed', methods=['GET'])
 @jwt_required()
 def get_treat():
     id = get_jwt_identity()
@@ -79,7 +79,7 @@ def get_treat():
         'patient_id': applied_treat.patient_id,
         'treatment_id': applied_treat.treatment_id,
         'given_by_doc_id': applied_treat.assigned_by
-    })
+    }), 200
 
 
 @utility_routes_bp.route('/assign', methods=['POST'])
@@ -130,7 +130,7 @@ def assign_patient():
     return jsonify({
         'assistant_id': new_assignment.assistant_id,
         'patient_id': new_assignment.patient_id
-    })
+    }), 200
     
 
 @utility_routes_bp.route('/tr/applied', methods=['GET', 'POST'])
@@ -148,17 +148,17 @@ def applied_treatment():
         if role != 'assist':
             return jsonify({
                 'message': 'Treatment should be applied by an assistant'
-            })
+            }), 401
         data = request.json
         if not data:
             return jsonify({
                 'message': 'Bad Request.'
-            })
+            }), 400
         treatment = data['treat_id']
         if not treatment:
             return jsonify({
                 'message': 'Missing Information!'
-            })
+            }), 400
 
         treatments = db.session.query(Treatment_patient.treatment_id)\
             .join(Assistant_assignment, Assistant_assignment.patient_id == Treatment_patient.patient_id)\
@@ -172,7 +172,7 @@ def applied_treatment():
         if treatment not in treatments_to_be_applied:
             return jsonify({
                 'message': 'No assigned patients has this treatment prescribed'
-            })
+            }), 400
         
         treatment_applied = Assistant_treatment(assistant_id=id, treatment_id=treatment)
         db.session.add(treatment_applied)

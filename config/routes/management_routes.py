@@ -270,7 +270,7 @@ def add_treatment():
     if provided_staff.role != 'doc':
         return jsonify({
             'message': 'Cannot add a treatment that is not issued by a doctor.'
-        })
+        }), 401
     
     new_treat = Treatment(doctor_id=provided_by, treatment_name=treat_name, description=treat_description)
     db.session.add(new_treat)
@@ -316,7 +316,7 @@ def edit_treatment(treatId):
         if provided_staff.role != 'doc':
             return jsonify({
                 'message': 'Cannot add a treatment that is not issued by a doctor.'
-            })
+            }), 401
         else:
             treatment.doctor_id = data['doc_id']
 
