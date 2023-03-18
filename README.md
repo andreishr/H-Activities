@@ -17,16 +17,16 @@ flask db migrate
 
 ## Routes:
 ### List of routes:
-Auth: /login   
-Employee management: /manage/add, /manage/{id}, /manage/{id}/remove  
-Patient management: /patient/add, /patient/{id}/edit, /patient/{id}/delete  
-Treatment management: /treatment/add, /treatment/{id}/edit, /treatment/{id}/remove
-Apply treatment and check treatment: /give/treatment/{patiendID}/{treatID}, /tr/prescribed
-Assign patient to assistant: /assign
-Treatment applied by assistants: /tr/applied  
-Reports: /docs/report, /treat/report
+Auth: *__/login__*   
+Employee management: *__/manage/add__* , *__/manage/{id}__* , *__/manage/{id}/remove__*  
+Patient management: *__/patient/add__* , *__/patient/{id}/edit__* , *__/patient/{id}/delete__*  
+Treatment management: *__/treatment/add__* , *__/treatment/{id}/edit__* , *__/treatment/{id}/remove__*  
+Apply treatment and check treatment: *__/give/treatment/{patiendID}/{treatID}__* , *__/tr/prescribed__*  
+Assign patient to assistant: *__/assign__*  
+Treatment applied by assistants: *__/tr/applied__*  
+Reports: *__/docs/report__* , *__/treat/report__*
 
-For detailed documentation about routes: /swagger
+For detailed documentation about routes: *__/swagger__*
 
 /logout : Unset jwt
 /refresh : Route defined for generating token when the acces token expires
@@ -35,9 +35,11 @@ For detailed documentation about routes: /swagger
 ∙ For running the test file:  
 python test_api.py
 
-Note:
+#### Notes:  
 Some tests might fail because of the changes inside the database (ex: in the case of providing a specific id in path).
 More tests have been made using Postman in order to observe more responses returned from each route.  
+Because multiple patients can have the same name and a doctor can have multiple patients, it can become difficult to identify patients in the *patient* table.  
+More queries might be used in order to get more details since few endpoints return only IDs.
 &nbsp;  
 &nbsp;  
 &nbsp;  
