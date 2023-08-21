@@ -2,10 +2,19 @@ from flask import Blueprint, request, jsonify
 from ..models import Staff
 from flask_jwt_extended import (create_access_token, set_access_cookies, jwt_required, 
     get_jwt_identity, unset_jwt_cookies, create_refresh_token, set_refresh_cookies)
-from werkzeug.security import check_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash
 
 auth_routes_bp = Blueprint('auth_routes_bp', __name__)
 
+#TEST PURPOSE ONLY TO INSERT
+@auth_routes_bp.route('/secretGen', methods = ['POST'])
+def secretGen():
+    data = request.json
+    password = data['password']
+    return jsonify({
+        'passGen' : generate_password_hash(password)
+    }), 200
+    
 
 @auth_routes_bp.route('/login', methods = ['POST'])
 def login():
@@ -13,7 +22,7 @@ def login():
     email = data['email']
     password = data['password']
     staff = Staff.query.filter_by(email=email).first()
-
+    
     if not staff:
         return jsonify({
             'message' : 'Wrong email or password'
